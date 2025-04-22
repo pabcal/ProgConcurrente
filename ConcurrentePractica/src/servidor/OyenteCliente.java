@@ -24,8 +24,8 @@ public class OyenteCliente extends Thread {
 
             while (conectado) {
                 Mensaje m = (Mensaje) in.readObject();
-//case 3 y 5 son respuestas (mensajes que envia el servidor)
-//estos cases son mensajes al servidor
+                //case 3 y 5 son respuestas (mensajes que envia el servidor)
+                //estos cases son mensajes al servidor
                 
                 switch (m.getTipo()) {
                     case 1: // Inicio de sesión
@@ -35,7 +35,7 @@ public class OyenteCliente extends Thread {
                         	    mi.getNombreUsuario(),
                         	    mi.getDireccionIP(),
                         	    mi.getPuertoP2P(),
-                        	    mi.getArchivosCompartidos()  // ✅ aquí usas los archivos reales del cliente
+                        	    mi.getArchivosCompartidos()  //aqui usamos los archivos reales del cliente
                         	);
                         monitor.registrarUsuario(usuario);
                         break;

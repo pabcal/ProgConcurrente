@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class MonitorUsuarios {
+	//este mapa representa todos los clientes conectados o registrados
     private final Map<String, Usuario> usuarios;
     private final Semaphore semaforo;
     private static final String ARCHIVO_USUARIOS = "usuarios.dat";
@@ -14,21 +15,23 @@ public class MonitorUsuarios {
         semaforo = new Semaphore(1, true);
         cargarUsuariosDesdeDisco();
     }
-
+    
+    //añade o actualiza un usuario
     public void registrarUsuario(Usuario usuario) {
         try {
             semaforo.acquire();
             usuarios.put(usuario.getNombre(), usuario);
             guardarUsuariosEnDisco();
-            System.out.println("🟢 Registrado usuario: " + usuario.getNombre());
-            System.out.println("📦 Archivos compartidos: " + usuario.getArchivosCompartidos());
+            System.out.println("Registrado usuario: " + usuario.getNombre());
+            System.out.println("Archivos compartidos: " + usuario.getArchivosCompartidos());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             semaforo.release();
         }
     }
-
+    
+    //quita un usuario del mapa
     public void eliminarUsuario(String nombre) {
         try {
             semaforo.acquire();
@@ -41,6 +44,7 @@ public class MonitorUsuarios {
         }
     }
 
+    //funcion que utilizamos para recorrer todos los usuarios y construir el hashmap
     public Map<String, String> obtenerArchivosDisponibles() {
         try {
             semaforo.acquire();
@@ -50,7 +54,7 @@ public class MonitorUsuarios {
                     resultado.put(archivo, u.getNombre());
                 }
             }
-            System.out.println("📤 Archivos enviados a cliente: " + resultado);
+            System.out.println("Archivos enviados a cliente: " + resultado);
             return resultado;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -63,12 +67,14 @@ public class MonitorUsuarios {
     public Usuario getUsuarioPorArchivo(String archivo) {
         try {
             semaforo.acquire();
+            Usuario userToReturn = null;
             for (Usuario u : usuarios.values()) {
                 if (u.getArchivosCompartidos().contains(archivo)) {
-                    return u;
+                	userToReturn = u;
+                    break;
                 }
             }
-            return null;
+            return userToReturn;
         } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
