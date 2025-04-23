@@ -6,7 +6,7 @@ import java.util.List;
 public class Usuario implements Serializable {
 	//al implementar la clase Serializable permite a la clase Usuario convertirse en una
 	//secuencia de Bytes y vicerversa
-	//de esta manera almacenar el objeto Usuario, eviarlo y o recuperarlo
+	//de esta manera podemos almacenar el objeto Usuario, eviarlo y o recuperarlo
     private String nombre;
     private String direccionIP;
     private int puertoP2P;

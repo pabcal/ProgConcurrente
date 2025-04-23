@@ -7,9 +7,15 @@ import java.util.concurrent.Semaphore;
 public class MonitorUsuarios {
 	//este mapa representa todos los clientes conectados o registrados
     private final Map<String, Usuario> usuarios;
-    private final Semaphore semaforo;
+    private final Semaphore semaforo; //semaforo que utilizamos como lock FIFO
     private static final String ARCHIVO_USUARIOS = "usuarios.dat";
-
+    
+    /*Necesitamos un tipo de lock aqui porque multiples hilos de OyenteCliente van a acceder
+     * al mismo mapa compartido al mismo tiempo. Si tenemos que dos hilos llaman a la vez a 
+     * registrarUsuario y eliminarUsuario por ejemplo, matariamos la concurrencia
+     * Hemos elegido un semaphore con parametro true, para garantizar una exclusion mutua
+     * que vaya en orden*/
+    
     public MonitorUsuarios() {
         usuarios = new HashMap<>();
         semaforo = new Semaphore(1, true);
@@ -63,7 +69,8 @@ public class MonitorUsuarios {
             semaforo.release();
         }
     }
-
+    
+    //devuelve el usuario que comparte el archivo dado
     public Usuario getUsuarioPorArchivo(String archivo) {
         try {
             semaforo.acquire();

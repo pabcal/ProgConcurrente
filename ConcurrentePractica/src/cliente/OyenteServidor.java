@@ -11,7 +11,8 @@ public class OyenteServidor extends Thread {
         this.in = in;
         this.cliente = cliente;
     }
-
+    
+    // escucha continuamente el flujo in que viene del servidor central
     public void run() {
         try {
             while (true) {

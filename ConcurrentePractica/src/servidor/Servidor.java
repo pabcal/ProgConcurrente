@@ -15,7 +15,7 @@ import java.net.Socket;
 
 public class Servidor {
     public static void main(String[] args) {
-        final int PUERTO = 12345;
+        final int PUERTO = 12345; //establecemos este puerto por establecer uno
         MonitorUsuarios monitor = new MonitorUsuarios();
 
         try (ServerSocket servidor = new ServerSocket(PUERTO)) {

@@ -12,6 +12,7 @@ public class OyenteP2P extends Thread {
 		this.puerto = puerto;
 		this.carpetaCompartida = carpetaCompartida;
 	}
+	
 
 	public void run() {
 		try (ServerSocket servidor = new ServerSocket(puerto)) {
@@ -25,7 +26,12 @@ public class OyenteP2P extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/*
+	 * Recibe el nombre del fichero, comprueba si existe la carpeta Compartida
+	 * Responde Ok y envia el contenido en bloques
+	 * Si no existe envia Error y cierra
+	 * */
 	private void manejarCliente(Socket cliente) {
 		try (DataInputStream in = new DataInputStream(cliente.getInputStream());
 				DataOutputStream out = new DataOutputStream(cliente.getOutputStream())) {
@@ -45,7 +51,7 @@ public class OyenteP2P extends Thread {
 				while ((bytes = fis.read(buffer)) != -1) {
 					out.write(buffer, 0, bytes);
 					out.flush(); // asegurar envío
-					Thread.sleep(1000); // ✅ simula transferencia lenta para ver concurrencia
+					Thread.sleep(1000); // simulamos transferencia lenta para ver concurrencia
 				}
 			}
 

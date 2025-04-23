@@ -14,7 +14,7 @@ import cliente.gui.VentanaPrincipal;
 
 
 public class Cliente {
-    private ObjectOutputStream out;
+    private ObjectOutputStream out; //flujo para enviar mensajes al servidor
     private String nombreUsuario;
     private String ipLocal;
     private int puertoP2P;
@@ -25,26 +25,29 @@ public class Cliente {
     private VentanaPrincipal ventanaPrincipal;
    
     
-
+    //crea las carpetas si no existen e inicia el hilo OyenteP2P
     public Cliente(String nombreUsuario, String ipLocal, int puertoP2P) {
         this.nombreUsuario = nombreUsuario;
         this.ipLocal = ipLocal;
         this.puertoP2P = puertoP2P;
 
         this.carpetaCompartida = new File("compartido_" + nombreUsuario);
-        if (!carpetaCompartida.exists()) carpetaCompartida.mkdir();
+        if (!carpetaCompartida.exists()) 
+        	carpetaCompartida.mkdir();
 
         this.carpetaDescargas = new File("descargas_" + nombreUsuario);
-        if (!carpetaDescargas.exists()) carpetaDescargas.mkdir();
+        if (!carpetaDescargas.exists()) 
+        	carpetaDescargas.mkdir();
 
         new OyenteP2P(puertoP2P, carpetaCompartida).start();
     }
     
-
+    //getter para el nombre de usuario
     public String getNombreUsuario() {
         return nombreUsuario;
     }
-
+    
+    //abre un Socket al puerto preestablecido, tambien inicializa out e in
     public void conectarAlServidor() {
         try {
             Socket socket = new Socket("localhost", 12345);
@@ -52,16 +55,21 @@ public class Cliente {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
             List<String> archivosCompartidos = obtenerArchivosCompartidos();
-            out.writeObject(new MensajeInicioSesion(nombreUsuario, ipLocal, puertoP2P, archivosCompartidos));
-            new OyenteServidor(in, this).start();
+            MensajeInicioSesion mensaje = new MensajeInicioSesion(nombreUsuario, ipLocal, puertoP2P, archivosCompartidos);
+            out.writeObject(mensaje);
+            //iniciamos el hilo OyenteServidor para procesar las respuesta entrantes
+            new OyenteServidor(in, this).start(); 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    
+    
+    //las dos siguientes funciones envian al servidor los mensajes correspondientes
     public void solicitarListaArchivos() {
         try {
-            out.writeObject(new MensajePeticionLista());
+        	MensajePeticionLista mensajePeticion = new MensajePeticionLista();
+            out.writeObject(mensajePeticion);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,15 +77,18 @@ public class Cliente {
 
     public void solicitarDescarga(String nombreArchivo) {
         try {
-            out.writeObject(new MensajePeticionDescarga(nombreArchivo));
+        	MensajePeticionDescarga mensajeDescarga = new MensajePeticionDescarga(nombreArchivo);
+            out.writeObject(mensajeDescarga);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    
+    //envia un mensaje fin de sesion para que el servidor de de baja al usuario
     public void cerrarSesion() {
         try {
-            out.writeObject(new MensajeFinSesion(nombreUsuario));
+        	MensajeFinSesion mensajeFin = new MensajeFinSesion(nombreUsuario);
+            out.writeObject(mensajeFin);
         } catch (IOException e) {
             e.printStackTrace();
         }
